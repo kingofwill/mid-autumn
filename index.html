@@ -538,18 +538,23 @@
             // Set volume to 50% for better user experience
             audio.volume = 0.5;
 
-            // Try to auto-play immediately
-            audio.play().then(() => {
-                isPlaying = true;
-                playIcon.textContent = '⏸️';
-                playIcon.style.opacity = '1';
-                console.log('Audio auto-played successfully');
-            }).catch(error => {
-                console.log('Auto-play failed, waiting for user interaction:', error);
-                // Fallback: show play button
-                playIcon.textContent = '🎵';
-                playIcon.style.opacity = '0.7';
-            });
+            // Auto-play after first user interaction
+            let hasInteracted = false;
+            document.addEventListener('click', function() {
+                if (!hasInteracted) {
+                    hasInteracted = true;
+                    audio.play().then(() => {
+                        isPlaying = true;
+                        playIcon.textContent = '⏸️';
+                        playIcon.style.opacity = '1';
+                        console.log('Audio played after user interaction');
+                    }).catch(error => {
+                        console.log('Audio play failed after interaction:', error);
+                        playIcon.textContent = '🔇';
+                        playIcon.style.opacity = '0.5';
+                    });
+                }
+            }, { once: true });
 
             // Play/Pause button click handler
             playPauseBtn.addEventListener('click', function() {
